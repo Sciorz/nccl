@@ -1,0 +1,52 @@
+# 此文件配置 clang-tidy 进行静态代码分析
+# 配置灵感来源于 RAPIDS.ai 和其他现代 C++ 项目的检查规则
+# 适用于 NCCL 项目的代码质量检查
+
+Checks: >
+  -*, # 默认禁用所有检查，然后选择性启用
+  
+  # --- 启用各种模块的检查 ---
+  bugprone-*,        # 启用所有 bugprone 检查：检测常见的编程错误和陷阱
+  cert-*,            # 启用所有 CERT 检查：基于 CERT 安全编码标准的检查
+  cppcoreguidelines-*, # 启用所有 C++ 核心指南检查：遵循现代 C++ 最佳实践
+  modernize-*,       # 启用所有现代化检查：将代码升级到现代 C++ 标准
+  performance-*,     # 启用所有性能检查：检测性能问题和优化机会
+  readability-*,     # 启用所有可读性检查：提高代码可读性和维护性
+
+  # --- 禁用特定的、过于嘈杂或有争议的检查 ---
+  -modernize-use-trailing-return-type, # 禁用尾随返回类型：可能过于激进
+  -modernize-use-nodiscard, # 禁用 nodiscard 属性：在遗留代码库中可能过于嘈杂
+  -cppcoreguidelines-avoid-magic-numbers, # 禁用魔法数字检查：通常过于嘈杂
+  -readability-magic-numbers, # 禁用可读性魔法数字检查：通常过于嘈杂
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic, # 禁用指针算术边界检查
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay, # 禁用数组到指针衰减检查
+  -readability-identifier-naming, # 禁用标识符命名检查：不过于严格，但保持关注
+  -cert-err58-cpp, # 禁用 CERT 错误 58: 可能与常见的日志/调试实践冲突
+
+  -modernize-use-equals-default,           # 禁用：自动修复损坏
+  -modernize-concat-nested-namespaces,     # 禁用：自动修复损坏
+  -modernize-return-braced-init-list,      # 禁用：样式偏好
+  -modernize-use-bool-literals,            # 禁用：测试代码使用 int 标志
+  -modernize-use-constraints,              # 禁用：需要 C++20
+  -modernize-use-ranges,                   # 禁用：需要 C++20
+  -modernize-use-designated-initializers,  # 禁用：需要 C++20
+  clang-analyzer-*,                        # 启用所有 clang 分析器检查
+  -clang-analyzer-cplusplus.NewDeleteLeaks, # 禁用：存在已知错误
+  -clang-analyzer-optin.core.EnumCastOutOfRange, # 禁用: 与枚举标志冲突
+  -clang-analyzer-optin.cplusplus.UninitializedObject, # 禁用: nanoarrow 错误
+
+HeaderFilterRegex: '.*'  # 对所有头文件应用检查
+ExcludeHeaderFilterRegex: '.*(Message_generated.h|Schema_generated.h|brotli_dict.hpp|unbz2.hpp|cxxopts.hpp).*'  # 排除生成的文件和第三方库头文件
+FormatStyle:     none  # 不应用任何格式化样式
+
+CheckOptions:  # 检查选项配置
+  - key:             readability-identifier-naming.VariableCase
+    value:           'lower_case'        # 变量命名使用下划线分隔的小写
+  - key:             readability-identifier-naming.FunctionCase
+    value:           'CamelCase'         # 函数命名使用驼峰命名法
+  - key:             readability-identifier-naming.GlobalConstantCase
+    value:           'UPPER_CASE'        # 全局常量使用全大写
+  - key:             readability-identifier-naming.StructCase
+    value:           'CamelCase'         # 结构体命名使用驼峰命名法
+  - key:             readability-identifier-naming.ClassCase
+    value:           'CamelCase'         # 类命名使用驼峰命名法

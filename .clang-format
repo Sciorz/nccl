@@ -1,0 +1,110 @@
+# 基于 src/init.cc 代码风格分析的配置文件
+# 此文件用于 clang-format 工具自动格式化 C++/CUDA 代码
+# 针对 NCCL 项目的代码风格进行了优化
+
+Language: Cpp                    # 指定编程语言为 C++
+BasedOnStyle: Google             # 基于 Google C++ 风格指南
+
+# --- 缩进和间距设置 ---
+IndentWidth: 2                   # 缩进宽度为 2 个空格
+TabWidth: 2                      # Tab 键宽度为 2 个空格
+UseTab: Never                    # 不使用 Tab 键，只使用空格
+AccessModifierOffset: -1         # 访问修饰符（public/private/protected）的缩进偏移量
+IndentCaseLabels: false          # case 标签不缩进
+IndentCaseBlocks: false          # case 块不缩进
+IndentFunctionDeclarationAfterType: false  # 函数声明后的类型不缩进
+IndentPPDirectives: None         # 预处理指令不缩进
+IndentWrappedFunctionNames: false # 换行的函数名不缩进
+
+# --- 行换行和包装设置 ---
+ColumnLimit: 200                 # 行长度限制为 200 字符
+BreakBeforeBraces: Attach        # 大括号与前面的代码在同一行
+BinPackArguments: true           # 允许函数参数打包到同一行
+BinPackParameters: true          # 允许函数参数列表打包
+BreakBeforeBinaryOperators: None # 不在二元操作符前换行
+BreakBeforeTernaryOperators: true # 在三元操作符前换行
+BreakConstructorInitializers: BeforeColon  # 构造函数初始化列表在冒号前换行
+BreakStringLiterals: false       # 不强制换行字符串字面量
+
+# --- 短语句和块设置 ---
+AllowShortFunctionsOnASingleLine: None  # 不允许短函数放在一行
+AllowShortBlocksOnASingleLine: false    # 不允许短块放在一行
+AllowShortCaseLabelsOnASingleLine: true # 允许短 case 标签放在一行
+AllowShortIfStatementsOnASingleLine: true # 允许短 if 语句放在一行
+AllowShortLoopsOnASingleLine: false     # 不允许短循环放在一行
+AllowShortLambdasOnASingleLine: false   # 不允许短 lambda 表达式放在一行
+AllowAllParametersOfDeclarationOnNextLine: true  # 允许所有参数声明在下一行
+
+# --- 惩罚系统 - 超高惩罚值以保持精确格式 ---
+# 使用极高的惩罚值来防止任何不必要的换行
+PenaltyBreakAssignment: 1000000         # 赋值语句换行的惩罚值
+PenaltyBreakBeforeFirstCallParameter: 1000000  # 第一个调用参数前换行的惩罚值
+PenaltyBreakComment: 1000000            # 注释换行的惩罚值
+PenaltyBreakFirstLessLess: 1000000     # 第一个 << 操作符前换行的惩罚值
+PenaltyBreakString: 1000000             # 字符串换行的惩罚值
+PenaltyBreakOpenParenthesis: 1000000    # 开括号后换行的惩罚值
+PenaltyBreakTemplateDeclaration: 1000000 # 模板声明换行的惩罚值
+PenaltyExcessCharacter: 1000000         # 超出字符限制的惩罚值
+PenaltyReturnTypeOnItsOwnLine: 1000000  # 返回类型单独一行的惩罚值
+
+# --- 指针和引用对齐设置 ---
+PointerAlignment: Left           # 指针符号 * 靠近变量名（左对齐）
+ReferenceAlignment: Left         # 引用符号 & 靠近变量名（左对齐）
+DerivePointerAlignment: false    # 不自动推导指针对齐方式
+
+# --- 头文件包含设置 ---
+# 匹配 init.cc 中使用的头文件顺序
+IncludeBlocks: Regroup           # 重新分组头文件块
+IncludeCategories:
+  - Regex: '^"nccl\.h$'      # NCCL 核心头文件 - 优先级 1
+  - Regex: '^".*\.h"'        # 其他项目头文件 - 优先级 2
+  - Regex: '^<.*\.h>'        # 系统头文件 - 优先级 3
+  - Regex: '^<.*>'           # 其他系统头文件 - 优先级 4
+SortIncludes: false               # 对头文件进行排序
+SortUsingDeclarations: true      # 对 using 声明进行排序
+
+# --- 对齐和间距设置 ---
+# 禁用所有连续对齐以保持原始格式
+AlignConsecutiveAssignments: false      # 不连续对齐赋值语句
+AlignConsecutiveDeclarations: false     # 不连续对齐声明语句
+AlignConsecutiveMacros: false           # 不连续对齐宏定义
+AlignOperands: false                    # 不对齐操作数
+AlignTrailingComments: true             # 对齐尾随注释
+
+# --- 函数和类格式化设置 ---
+AlwaysBreakAfterReturnType: None        # 返回类型后不强制换行
+AlwaysBreakBeforeMultilineStrings: false # 多行字符串前不强制换行
+AlwaysBreakTemplateDeclarations: Yes    # 模板声明总是换行
+CompactNamespaces: false                # 不压缩命名空间
+ConstructorInitializerAllOnOneLineOrOnePerLine: false  # 构造函数初始化列表不强制一行
+ConstructorInitializerIndentWidth: 4    # 构造函数初始化列表缩进宽度
+ContinuationIndentWidth: 4              # 续行缩进宽度
+Cpp11BracedListStyle: false             # 不使用 C++11 大括号列表样式
+FixNamespaceComments: true              # 修复命名空间注释
+KeepEmptyLinesAtTheStartOfBlocks: false # 不在块开始处保留空行
+MaxEmptyLinesToKeep: 1                  # 保留的最大空行数
+NamespaceIndentation: None              # 命名空间不缩进
+ObjCBinPackProtocolList: Never          # Objective-C 协议列表从不打包
+ObjCBlockIndentWidth: 2                 # Objective-C 块缩进宽度
+ObjCSpaceAfterProperty: false           # Objective-C 属性后不加空格
+ObjCSpaceBeforeProtocolList: true      # Objective-C 协议列表前加空格
+ReflowComments: false                   # 不重新格式化注释
+
+# --- 间距和操作符设置 ---
+SpaceAfterCStyleCast: false             # C 风格转换后不加空格
+SpaceAfterTemplateKeyword: true         # 模板关键字后加空格
+SpaceBeforeAssignmentOperators: true    # 赋值操作符前加空格
+SpaceBeforeCpp11BracedList: false      # C++11 大括号列表前不加空格
+SpaceBeforeCtorInitializerColon: true  # 构造函数初始化列表冒号前加空格
+SpaceBeforeInheritanceColon: true      # 继承冒号前加空格
+SpaceBeforeParens: ControlStatements   # 控制语句括号前加空格
+SpaceInEmptyParentheses: false          # 空括号内不加空格
+SpacesBeforeTrailingComments: 1        # 尾随注释前的空格数
+SpacesInAngles: false                   # 尖括号内不加空格
+SpacesInContainerLiterals: false        # 容器字面量内不加空格
+SpacesInCStyleCastParentheses: false    # C 风格转换括号内不加空格
+SpacesInParentheses: false              # 括号内不加空格
+SpacesInSquareBrackets: false           # 方括号内不加空格
+
+# --- 预处理器设置 ---
+PPIndentWidth: 2                        # 预处理器指令缩进宽度
