@@ -1,0 +1,34 @@
+# .pre-commit-config.yaml
+# This configuration runs checks only on the files you've staged for commit.
+# This is the ideal way to avoid linting the entire repository.
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+
+-   repo: https://github.com/pocc/pre-commit-hooks
+    rev: v1.3.5
+    hooks:
+    # This hook runs clang-format on staged files and fixes them in-place.
+    # It will only touch the files you are about to commit.
+    -   id: clang-format
+        args: ["-i"] # Use -i to auto-fix formatting
+        types_or: [c++, cuda, c, c-header]
+
+# clang-tidy is more complex for pre-commit because it needs compile_commands.json
+# and running it on a whole file can still be slow. A CI check (Method 2)
+# is often a better place for it. But if you want it here, you can use a local hook.
+-   repo: local
+    hooks:
+    -   id: clang-tidy
+        name: clang-tidy
+        description: "Run clang-tidy on staged C++/CUDA files."
+        # This command is complex: it finds staged files, then runs clang-tidy on them.
+        # It requires `compile_commands.json` to be present in the `build` directory.
+        entry: bash -c 'files=$(git diff --name-only --cached --diff-filter=ACMRTUXB); [ -z "$files" ] || clang-tidy -p build/ $files'
+        language: system
+        types_or: [c++, cuda]
+        pass_filenames: false

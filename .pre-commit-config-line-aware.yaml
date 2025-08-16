@@ -1,0 +1,16 @@
+# .pre-commit-config-line-aware.yaml
+# This configuration uses git-clang-format to format ONLY the changed lines.
+
+repos:
+-   repo: local
+    hooks:
+    -   id: git-clang-format
+        name: clang-format-changed-lines
+        description: "Run clang-format only on the lines you've changed."
+        # This command runs git-clang-format against the upstream main branch.
+        # It stages the changes automatically.
+        # You might need to adjust 'upstream/main' to your target branch.
+        entry: bash -c 'git-clang-format --staged upstream/main && git add -u'
+        language: system
+        types_or: [c++, cuda, c, c-header]
+        pass_filenames: false

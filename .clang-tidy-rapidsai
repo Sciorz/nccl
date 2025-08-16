@@ -1,0 +1,66 @@
+---
+# 关于禁用检查的说明
+# ------------------------
+# modernize-use-equals-default:
+#     自动修复功能已损坏（无法正确插入 =default）
+# modernize-concat-nested-namespaces:
+#     自动修复功能已损坏（可能删除代码）
+# modernize-use-trailing-return-type:
+#     纯样式检查，重写所有内容没有好处
+# modernize-return-braced-init-list:
+#     在样式上我们更喜欢在返回位置看到返回类型。
+#     更多信息请参见：https://github.com/rapidsai/cudf/pull/16956#pullrequestreview-2341891672
+# modernize-use-bool-literals:
+#     我们的测试广泛使用 int 标志作为有效性掩码，我们更喜欢这种方式
+# modernize-use-constraints:
+#     需要 C++20 功能的新检查
+# modernize-use-ranges:
+#     需要 C++20 功能的新检查
+# modernize-use-designated-initializers:
+#     需要 C++20 功能的新检查
+# clang-analyzer-cplusplus.NewDeleteLeaks:
+#     此检查存在许多错误，请参见
+#     https://github.com/llvm/llvm-project/issues?q=is%3Aissue+is%3Aopen+newdeleteleaks
+#     我们至少遇到以下问题：
+#     https://github.com/llvm/llvm-project/issues/60896
+#     https://github.com/llvm/llvm-project/issues/69602
+# clang-analyzer-optin.core.EnumCastOutOfRange
+#     我们在多个情况下使用枚举作为标志，此检查使 OR 标志无效
+# clang-analyzer-optin.cplusplus.UninitializedObject'
+#     nanoarrow 中存在一个错误，clang-tidy 过滤器（即
+#     header-filter 和 exclude-header-filter）都无法正确避免。这
+#     值得进一步调查
+#
+# 我们需要验证损坏的检查是否仍然损坏
+
+Checks:  # 启用的检查规则
+      'modernize-*,  # 启用所有现代化检查
+       -modernize-use-equals-default,           # 禁用：自动修复损坏
+       -modernize-concat-nested-namespaces,     # 禁用：自动修复损坏
+       -modernize-use-trailing-return-type,     # 禁用：纯样式，无实际好处
+       -modernize-return-braced-init-list,      # 禁用：样式偏好
+       -modernize-use-bool-literals,            # 禁用：测试代码使用 int 标志
+       -modernize-use-constraints,              # 禁用：需要 C++20
+       -modernize-use-ranges,                   # 禁用：需要 C++20
+       -modernize-use-designated-initializers,  # 禁用：需要 C++20
+       clang-analyzer-*,                        # 启用所有 clang 分析器检查
+       -clang-analyzer-cplusplus.NewDeleteLeaks, # 禁用：存在已知错误
+       -clang-analyzer-optin.core.EnumCastOutOfRange, # 禁用：与枚举标志冲突
+       -clang-analyzer-optin.cplusplus.UninitializedObject' # 禁用：nanoarrow 错误
+
+WarningsAsErrors: '*'  # 将所有警告视为错误，确保代码质量
+HeaderFilterRegex: '.*cudf/cpp/(src|include).*'  # 只对 cudf 相关文件应用检查
+ExcludeHeaderFilterRegex: '.*(Message_generated.h|Schema_generated.h|brotli_dict.hpp|unbz2.hpp|cxxopts.hpp).*'  # 排除生成的文件和第三方库头文件
+FormatStyle:     none  # 不应用任何格式化样式
+
+CheckOptions:  # 检查选项配置
+ - key:             modernize-loop-convert.MaxCopySize
+   value:           '16'                # 循环转换的最大复制大小限制
+ - key:             modernize-loop-convert.MinConfidence
+   value:           reasonable          # 循环转换的最小置信度：合理
+ - key:             modernize-pass-by-value.IncludeStyle
+   value:           llvm                # 按值传递的包含样式：LLVM 风格
+ - key:             modernize-replace-auto-ptr.IncludeStyle
+   value:           llvm                # 替换 auto_ptr 的包含样式：LLVM 风格
+ - key:             modernize-use-nullptr.NullMacros
+   value:           'NULL'              # nullptr 检查的 NULL 宏定义

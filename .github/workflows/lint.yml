@@ -1,0 +1,36 @@
+# This GitHub Actions workflow runs linters to ensure code quality.
+# It is triggered on pushes and pull requests to the main branch.
+
+name: Code Quality Check
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format clang-tidy cmake
+
+    - name: Configure Build (to generate compile_commands.json)
+      # This step is crucial for clang-tidy to understand the code.
+      # It assumes you are using CMake.
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+    - name: Run Linter Script
+      # This script runs both clang-format and clang-tidy in check-only mode.
+      # If it finds any issues, it will exit with a non-zero code, failing the CI job.
+      run: ./run-linter.sh # Assumes the script is in the project root
