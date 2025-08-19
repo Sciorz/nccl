@@ -1,42 +1,13 @@
-# This file configures the pre-commit hooks that run before each commit.
-# It helps to automatically enforce code style and prevent simple errors.
-#
-# To use this:
-# 1. Install pre-commit: pip install pre-commit
-# 2. Install the hooks: pre-commit install
+# .pre-commit-config.yaml
+# This configuration runs clang-format only on modified lines of C/C++/CUDA files
 
 repos:
-# --- Standard basic hooks ---
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+-   repo: local
     hooks:
-    -   id: trailing-whitespace # Trims trailing whitespace
-    -   id: end-of-file-fixer   # Ensures files end in a newline
-    -   id: check-yaml          # Checks yaml files for parseable syntax
-    -   id: check-added-large-files # Prevents committing large files
-
-# --- C++/CUDA Formatting Hook ---
--   repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
-    hooks:
-    -   id: clang-format
-        # Run clang-format on C++, CUDA, and header files.
-        # The `-i` flag tells it to fix files in-place.
-        args: ["-i"]
-        types_or: [c++, cuda, c, c-header]
-
-# --- Optional: clang-tidy hook (more advanced) ---
-# This hook runs clang-tidy on changed files. It's powerful but can be slow
-# and requires compile_commands.json to be up-to-date.
-# Many teams prefer to run clang-tidy only in CI.
-# Uncomment the following section if you want to enable it locally.
-#
-# -   repo: local
-#     hooks:
-#     -   id: clang-tidy
-#         name: clang-tidy
-#         description: "Run clang-tidy on changed C++/CUDA files."
-#         entry: bash -c 'clang-tidy -p build/ $(git diff --name-only --cached --diff-filter=ACMRTUXB) -fix'
-#         language: system
-#         types_or: [c++, cuda]
-#         pass_filenames: false
+    -   id: clang-format-modified-lines
+        name: clang-format-modified-lines
+        description: "Run clang-format only on modified lines of C/C++/CUDA files"
+        entry: ./.pre-commit-clang-format.sh
+        language: system
+        pass_filenames: false
+        always_run: true
