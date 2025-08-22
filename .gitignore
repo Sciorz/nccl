@@ -2,3 +2,5 @@
 /build
 *.gcov
 /coverage/
+**/compile_commands.json
+.cache/

@@ -2,12 +2,28 @@
 # This configuration runs clang-format only on modified lines of C/C++/CUDA files
 
 repos:
--   repo: local
-    hooks:
-    -   id: clang-format-modified-lines
-        name: clang-format-modified-lines
-        description: "Run clang-format only on modified lines of C/C++/CUDA files"
-        entry: ./.pre-commit-clang-format.sh
-        language: system
-        pass_filenames: false
-        always_run: true
+- repo: https://github.com/pre-commit/mirrors-clang-format
+  rev: v17.0.6
+  hooks:
+    - id: clang-format
+      # We don't run this hook directly, so we assign it to a manual stage.
+      stages: [manual]
+
+- repo: local
+  hooks:
+    - id: git-clang-format-lines
+      name: Format changed lines with git-clang-format
+      entry: ./scripts/pre-commit-clang-format.sh
+      language: script
+      files: '\.(c|h|cpp|hpp|cc|hh|cxx|hxx|cu|cuh)$'
+      stages: [pre-commit]
+
+# -   repo: local
+#     hooks:
+#     -   id: clang-format-modified-lines
+#         name: clang-format-modified-lines
+#         description: "Run clang-format only on modified lines of C/C++/CUDA files"
+#         entry: ./.pre-commit-clang-format.sh
+#         language: system
+#         pass_filenames: false
+#         always_run: true

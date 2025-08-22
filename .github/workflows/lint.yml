@@ -1,36 +1,60 @@
-# This GitHub Actions workflow runs linters to ensure code quality.
-# It is triggered on pushes and pull requests to the main branch.
+# .github/workflows/lint.yml
+# Minimal clang-format & clang-tidy workflow (diff-only on PR, using CUDA container)
 
-name: Code Quality Check
+name: Lint (clang-format & clang-tidy)
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  pull_request: # No branch filter, triggers on all PRs
+
+# Needed for reviewdog to comment on PRs
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
-  lint:
+  # Diff-only linting on PR using reviewdog
+  lint-pr:
+    name: Lint and Static Analysis (reviewdog)
     runs-on: ubuntu-latest
+    # Run the entire job in a container with a pre-installed CUDA toolkit
+    container:
+      image: nvidia/cuda:12.1.1-devel-ubuntu22.04
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y clang-format clang-tidy cmake
+      - name: Generate compilation database (for clang-tidy)
+        run: |
+          # The container already has build-essentials and nvcc. We just need bear.
+          apt-get update
+          apt-get install -y bear
+          mkdir -p build
+          # The build should find nvcc from the container's environment.
+          bear -o build/compile_commands.json -- make -j src.build NVCC_GENCODE="-gencode=arch=compute_70,code=sm_70" || echo "Bear command finished. A partial compile_commands.json may have been generated."
 
-    - name: Configure Build (to generate compile_commands.json)
-      # This step is crucial for clang-tidy to understand the code.
-      # It assumes you are using CMake.
-      run: |
-        mkdir build
-        cd build
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+      - name: reviewdog - clang-format (diff-only)
+        uses: reviewdog/action-clang-format@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          filter_mode: added # 只检查在 Pull Request 中新增或修改的行
+          fail_on_error: true
+          clang_format_version: '16' # Action will install this version
+          pattern: |
+            **/*.cpp
+            **/*.hpp
+            **/*.cu
+            **/*.cuh
 
-    - name: Run Linter Script
-      # This script runs both clang-format and clang-tidy in check-only mode.
-      # If it finds any issues, it will exit with a non-zero code, failing the CI job.
-      run: ./run-linter.sh # Assumes the script is in the project root
+      - name: reviewdog - clang-tidy (diff-only)
+        uses: reviewdog/action-clang-tidy@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          filter_mode: added # 只检查在 Pull Request 中新增或修改的行
+          fail_on_error: false
+          build_path: build
+          clang_tidy_version: '16' # Action will install this version

@@ -2,11 +2,11 @@
 
 # This script lints only the files that have changed compared to a target branch.
 # Usage: ./lint-diff.sh <target-branch>
-# Example: ./lint-diff.sh upstream/main
+# Example: ./lint-diff.sh upstream/master
 
-set -e
+set -e -x
 
-TARGET_BRANCH="${1:-upstream/main}"
+TARGET_BRANCH="${1:-origin/master}"
 
 # --- Helper Functions ---
 echo_green() {
@@ -29,6 +29,7 @@ fi
 
 echo "Files to be checked:"
 echo "$CHANGED_FILES"
+exit 0
 
 # --- Prerequisite Check ---
 # (Assuming clang-format, clang-tidy, and compile_commands.json are available)

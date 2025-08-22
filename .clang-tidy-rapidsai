@@ -54,13 +54,22 @@ ExcludeHeaderFilterRegex: '.*(Message_generated.h|Schema_generated.h|brotli_dict
 FormatStyle:     none  # 不应用任何格式化样式
 
 CheckOptions:  # 检查选项配置
+  # 例如：当循环体内复制的对象大小不超过16字节时，modernize-loop-convert 才会建议将传统 for 循环转换为基于范围的 for 循环
  - key:             modernize-loop-convert.MaxCopySize
    value:           '16'                # 循环转换的最大复制大小限制
+
+  # 例如：只有当 clang-tidy 认为转换为基于范围的 for 循环的置信度达到 reasonable（合理）时，才会给出建议
  - key:             modernize-loop-convert.MinConfidence
    value:           reasonable          # 循环转换的最小置信度：合理
+
+  # 例如：当建议将参数按值传递时，头文件包含风格会采用 LLVM 风格（#include <vector> 而不是 #include "vector"）
  - key:             modernize-pass-by-value.IncludeStyle
    value:           llvm                # 按值传递的包含样式：LLVM 风格
+
+  # 例如：当建议用 std::unique_ptr 替换 std::auto_ptr 时，头文件包含风格会采用 LLVM 风格
  - key:             modernize-replace-auto-ptr.IncludeStyle
    value:           llvm                # 替换 auto_ptr 的包含样式：LLVM 风格
+
+  # 例如：当代码中出现 NULL 时，modernize-use-nullptr 会建议替换为 nullptr
  - key:             modernize-use-nullptr.NullMacros
    value:           'NULL'              # nullptr 检查的 NULL 宏定义
