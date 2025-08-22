@@ -49,7 +49,7 @@ static ncclResult_t commReclaim(ncclComm_t comm);
 
 static uint64_t hashUniqueId(ncclUniqueId const &id) {
   char const *bytes = (char const*)&id;
-  uint64_t h = 0xdeadbeef;
+      uint64_t h = 0xdeadbeef;
   for(int i=0; i < (int)sizeof(ncclUniqueId); i++) {
     h ^= h >> 32;
     h *= 0x8db3db47fa2994ad;
@@ -2405,7 +2405,7 @@ fail:
 
 NCCL_API(ncclResult_t, ncclMemFree, void *ptr);
 ncclResult_t  ncclMemFree(void *ptr) {
-  NVTX3_FUNC_RANGE_IN(nccl_domain);
+      NVTX3_FUNC_RANGE_IN(nccl_domain);
   ncclResult_t ret = ncclSuccess;
   int saveDevice;
 
@@ -2438,4 +2438,3 @@ exit:
 fail:
   goto exit;
 }
-// Another test comment
