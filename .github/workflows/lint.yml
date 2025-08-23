@@ -5,6 +5,7 @@ name: Lint (clang-format & clang-tidy)
 
 on:
   pull_request: # No branch filter, triggers on all PRs
+  push:
 
 # Needed for reviewdog to comment on PRs
 permissions:
