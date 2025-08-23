@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   # Diff-only linting on PR using reviewdog
-  lint-pr:
+  lint-pr-check:
     name: Lint and Static Analysis (reviewdog)
     runs-on: ubuntu-latest
     # Run the entire job in a container with a pre-installed CUDA toolkit
