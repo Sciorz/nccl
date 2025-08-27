@@ -45,7 +45,7 @@ jobs:
           exclude-regex: 'build/'
 
       - name: clang-tidy检查 (diff-only)
-        uses: ZedThree/clang-tidy-review@v0.14.0
+        uses: ZedThree/clang-tidy-review@v0.21.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           build_dir: build
