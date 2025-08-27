@@ -37,7 +37,7 @@ jobs:
           bear -o build/compile_commands.json -- make -j src.build NVCC_GENCODE="-gencode=arch=compute_70,code=sm_70" || echo "Bear command finished. A partial compile_commands.json may have been generated."
 
       - name: clang-format检查 (diff-only)
-        uses: jidicula/clang-format-action@v4.13.0
+        uses: jidicula/clang-format-action@v4.11.0
         with:
           clang-format-version: '16'
           check-path: 'src'
