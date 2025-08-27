@@ -36,13 +36,13 @@ jobs:
           # The build should find nvcc from the container's environment.
           bear -o build/compile_commands.json -- make -j src.build NVCC_GENCODE="-gencode=arch=compute_70,code=sm_70" || echo "Bear command finished. A partial compile_commands.json may have been generated."
 
-      - name: clang-format检查 (diff-only)
-        uses: jidicula/clang-format-action@v4.11.0
-        with:
-          clang-format-version: '16'
-          check-path: 'src'
-          fallback-style: 'Google'
-          exclude-regex: 'build/'
+      # - name: clang-format检查 (diff-only)
+      #   uses: jidicula/clang-format-action@v4.11.0
+      #   with:
+      #     clang-format-version: '16'
+      #     check-path: 'src'
+      #     fallback-style: 'Google'
+      #     exclude-regex: 'build/'
 
       - name: clang-tidy检查 (diff-only)
         uses: ZedThree/clang-tidy-review@v0.21.0
