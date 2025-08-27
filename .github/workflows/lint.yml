@@ -36,26 +36,20 @@ jobs:
           # The build should find nvcc from the container's environment.
           bear -o build/compile_commands.json -- make -j src.build NVCC_GENCODE="-gencode=arch=compute_70,code=sm_70" || echo "Bear command finished. A partial compile_commands.json may have been generated."
 
-      - name: reviewdog - clang-format (diff-only)
-        uses: reviewdog/action-clang-format@v2
+      - name: clang-format检查 (diff-only)
+        uses: jidicula/clang-format-action@v4.13.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: added # 只检查在 Pull Request 中新增或修改的行
-          fail_on_error: true
-          clang_format_version: '16' # Action will install this version
-          pattern: |
-            **/*.cpp
-            **/*.hpp
-            **/*.cu
-            **/*.cuh
+          clang-format-version: '16'
+          check-path: 'src'
+          fallback-style: 'Google'
+          exclude-regex: 'build/'
 
-      - name: reviewdog - clang-tidy (diff-only)
-        uses: reviewdog/action-clang-tidy@v2
+      - name: clang-tidy检查 (diff-only)
+        uses: ZedThree/clang-tidy-review@v0.14.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          filter_mode: added # 只检查在 Pull Request 中新增或修改的行
-          fail_on_error: false
-          build_path: build
-          clang_tidy_version: '16' # Action will install this version
+          token: ${{ secrets.GITHUB_TOKEN }}
+          build_dir: build
+          clang_tidy_version: '16'
+          split_workflow: false
+          lgtm_comment_body: ''
+          exclude: 'build/*'
