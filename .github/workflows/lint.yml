@@ -53,3 +53,46 @@ jobs:
           split_workflow: false
           lgtm_comment_body: ''
           exclude: 'build/*'
+
+
+  cpp-linter:
+    runs-on: ubuntu-latest
+    container:
+      image: nvidia/cuda:12.1.1-devel-ubuntu22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Generate compilation database (for clang-tidy)
+        run: |
+          # The container already has build-essentials and nvcc. We just need bear.
+          apt-get update
+          apt-get install -y bear
+          mkdir -p build
+          # The build should find nvcc from the container's environment.
+          bear -o build/compile_commands.json -- make -j src.build NVCC_GENCODE="-gencode=arch=compute_70,code=sm_70" || echo "Bear command finished. A partial compile_commands.json may have been generated."
+
+      - name: Run C++ Linter
+        id: linter
+        uses: cpp-linter/cpp-linter-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: 'file'  # 使用项目根目录的 .clang-format 文件
+          tidy-checks: '*'  # 开启所有 clang-tidy 检查
+          version: '18'  # 使用特定版本的 clang-tools
+          thread-comments: 'update' # 在 PR 中以评论形式显示结果
+          # lines-changed-only: true # 可选，只检查 PR 中修改的行
+
+      - name: Enforce clang-format strictness
+        if: steps.linter.outputs.format-checks-failed > 0
+        run: |
+          echo "Clang-format found formatting issues. This is a strict check."
+          exit 1
+      
+      - name: Handle clang-tidy warnings
+        if: steps.linter.outputs.tidy-checks-failed > 0
+        run: |
+          echo "Clang-tidy found warnings. These are informational."
+          # clang-tidy 的失败不导致工作流失败
+          exit 0
