@@ -31,7 +31,7 @@ jobs:
         run: |
           # The container already has build-essentials and nvcc. We just need bear.
           apt-get update
-          apt-get install -y bear
+          apt-get install -y bear lsb_release wget
           mkdir -p build
           # The build should find nvcc from the container's environment.
           bear -o build/compile_commands.json -- make -j src.build NVCC_GENCODE="-gencode=arch=compute_70,code=sm_70" || echo "Bear command finished. A partial compile_commands.json may have been generated."
